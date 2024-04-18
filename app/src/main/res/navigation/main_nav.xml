@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav"
+    app:startDestination="@id/splashFragment">
+
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="com.mubin.starwars.ui.SplashFragment"
+        android:label="fragment_splash"
+        tools:layout="@layout/fragment_splash" />
+
+    <fragment
+        android:id="@+id/characterFragment"
+        android:name="com.mubin.starwars.ui.character.CharacterFragment"
+        android:label="fragment_character"
+        tools:layout="@layout/fragment_character" />
+
+    <fragment
+        android:id="@+id/planetsFragment"
+        android:name="com.mubin.starwars.ui.planets.PlanetsFragment"
+        android:label="fragment_planets"
+        tools:layout="@layout/fragment_planets" />
+
+    <fragment
+        android:id="@+id/starshipsFragment"
+        android:name="com.mubin.starwars.ui.starships.StarshipsFragment"
+        android:label="fragment_starships"
+        tools:layout="@layout/fragment_starships" />
+
+
+</navigation>

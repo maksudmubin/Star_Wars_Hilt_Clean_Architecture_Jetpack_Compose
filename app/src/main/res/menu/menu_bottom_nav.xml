@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/characterFragment"
+        android:title="@string/characters"
+        android:icon="@drawable/ic_character_selector"/>
+
+    <item
+        android:id="@+id/starshipsFragment"
+        android:title="@string/starships"
+        android:icon="@drawable/ic_starship_selector"/>
+
+    <item
+        android:id="@+id/planetsFragment"
+        android:title="@string/planets"
+        android:icon="@drawable/ic_planet_selector"/>
+
+</menu>

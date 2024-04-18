@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="brandColor">#32D979</color>
+    <color name="splashBg">#FFFFFF</color>
+    <color name="commonColor">#3AD972</color>
+    <color name="primaryBg">#FFFFFF</color>
+    <color name="navBarStroke">#1A111B45</color>
+    <color name="warningColor">#D80027</color>
+    <color name="bottomNavUnchecked">#80111B45</color>
+    <color name="textColorDayNight">#111B45</color>
+    <color name="textColorDayNight2">#252525</color>
+    <color name="textColorDayNightTransparent">#80111B45</color>
+    <color name="indicatorNotSelected">#D9D9D9</color>
+    <color name="selectedServerBg">#263AD972</color>
+    <color name="btnBgDayNight">#FFFFFF</color>
+    <color name="btnStrokeDayNight">#1A111B45</color>
+    <color name="tabViewStrokeDayNight">#1A111B45</color>
+    <color name="backBtnSolidDayNight">#292D32</color>
+    <color name="backBtnStrokeDayNight">#1A292D32</color>
+    <color name="backBtnStrokeDayNight2">#1A292D32</color>
+    <color name="editTextSolid">#F8F8F8</color>
+    <color name="editTextStrokeFocused">#252525</color>
+    <color name="editTextStrokeNotFocused">#1A252525</color>
+    <color name="disabledBtnSolid">#ECECEC</color>
+    <color name="disabledBtnText">#8C8C8C</color>
+    <color name="copyBg">#F0FFF5</color>
+    <color name="settingsItemBg">#E7FFF1</color>
+    <color name="dividerBg">#0D252525</color>
+    <color name="divider2Bg">#1A060606</color>
+    <color name="switchTrackUncheckedBg">#E6E6E6</color>
+    <color name="switchTrackCheckedBg">#ADFFD0</color>
+    <color name="switchThumbUncheckedBg">#FFFFFF</color>
+    <color name="imageColorDayNight">#000000</color>
+</resources>
+
+

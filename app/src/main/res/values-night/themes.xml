@@ -1,0 +1,24 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.StarWars" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your dark theme here. -->
+        <item name="colorPrimary">@color/brandColor</item>
+        <item name="android:statusBarColor">@color/primaryBg</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="TabLayout_Theme" parent="Base.Theme.StarWars">
+        <item name="alpha">.8</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="MaterialAlertDialog.Rounded" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.MaterialAlertDialog.Rounded</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.MaterialAlertDialog.Rounded" parent="Base.Theme.StarWars">
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="Theme.Atomic" parent="Base.Theme.StarWars" />
+</resources>
