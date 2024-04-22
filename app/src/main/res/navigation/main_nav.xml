@@ -13,9 +13,9 @@
 
     <fragment
         android:id="@+id/characterFragment"
-        android:name="com.mubin.starwars.ui.character.CharacterFragment"
+        android:name="com.mubin.starwars.ui.character.list.CharactersFragment"
         android:label="fragment_character"
-        tools:layout="@layout/fragment_character" />
+        tools:layout="@layout/fragment_characters" />
 
     <fragment
         android:id="@+id/planetsFragment"
