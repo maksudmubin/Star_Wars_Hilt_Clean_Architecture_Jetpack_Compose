@@ -16,7 +16,7 @@ import javax.inject.Inject
 class CharacterListViewModel @Inject constructor(private val useCase: GetCharactersUseCase) : ViewModel() {
 
     private val _isLoading = MutableLiveData<Boolean>().apply {
-        value = true
+        value = false
     }
     val isLoading = _isLoading
 
@@ -31,6 +31,7 @@ class CharacterListViewModel @Inject constructor(private val useCase: GetCharact
 
     fun getCharacters(url: String = "") {
         try {
+            _isLoading.value = true
             viewModelScope.launch(Dispatchers.Main) {
                 val response = useCase(url)
                 _count.value = response?.count
