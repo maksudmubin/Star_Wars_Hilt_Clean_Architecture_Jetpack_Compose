@@ -4,6 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="brandColor">#32D979</color>
     <color name="splashBg">#FFFFFF</color>
+    <color name="splashIcon">#FF000000</color>
     <color name="commonColor">#3AD972</color>
     <color name="primaryBg">#FFFFFF</color>
     <color name="navBarStroke">#1A111B45</color>
