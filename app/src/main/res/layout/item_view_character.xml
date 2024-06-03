@@ -9,43 +9,110 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="@color/primaryBg"
         android:padding="16dp">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintGuide_percent=".4"
+            android:orientation="vertical"/>
+
+        <View
+            android:layout_width="2dp"
+            android:layout_height="0dp"
+            android:background="@color/splashIcon"
+            app:layout_constraintTop_toTopOf="@id/nameTitleTv"
+            app:layout_constraintStart_toStartOf="@+id/guideline"
+            app:layout_constraintEnd_toEndOf="@+id/guideline"
+            app:layout_constraintBottom_toBottomOf="@+id/dobTitleTv"/>
+
+        <TextView
+            android:id="@+id/nameTitleTv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:textAlignment="viewEnd"
+            android:fontFamily="@font/open_sans_semi_bold"
+            android:text="@string/name"
+            android:textColor="@color/textColorDayNight2"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/characterNameTv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:textSize="16sp"
             android:textColor="@color/textColorDayNight"
             android:fontFamily="@font/open_sans_bold"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintTop_toTopOf="@+id/nameTitleTv"
+            app:layout_constraintStart_toEndOf="@+id/guideline"
+            app:layout_constraintBottom_toBottomOf="@+id/nameTitleTv"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="Luke Skywalker"/>
 
         <TextView
-            android:id="@+id/characterGenderTv"
-            android:layout_width="match_parent"
+            android:id="@+id/genderTitleTv"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="@color/textColorDayNight2"
+            android:layout_marginEnd="16dp"
+            android:textAlignment="viewEnd"
+            android:layout_marginTop="8dp"
             android:fontFamily="@font/open_sans_semi_bold"
-            app:layout_constraintTop_toBottomOf="@+id/characterNameTv"
+            android:text="@string/gender"
+            android:textColor="@color/textColorDayNight2"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/nameTitleTv" />
+
+        <TextView
+            android:id="@+id/characterGenderTv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:textSize="16sp"
+            android:textAllCaps="true"
+            android:textColor="@color/textColorDayNight"
+            android:fontFamily="@font/open_sans_bold"
+            app:layout_constraintTop_toTopOf="@+id/genderTitleTv"
+            app:layout_constraintBottom_toBottomOf="@+id/genderTitleTv"
+            app:layout_constraintStart_toEndOf="@+id/guideline"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="Male"/>
 
         <TextView
-            android:id="@+id/characterBirthYearTv"
-            android:layout_width="match_parent"
+            android:id="@+id/dobTitleTv"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="@color/textColorDayNight2"
+            android:layout_marginEnd="16dp"
+            android:textAlignment="viewEnd"
+            android:layout_marginTop="8dp"
             android:fontFamily="@font/open_sans_semi_bold"
-            app:layout_constraintTop_toBottomOf="@+id/characterGenderTv"
+            android:text="@string/date_of_birth"
+            android:textColor="@color/textColorDayNight2"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/genderTitleTv" />
+
+        <TextView
+            android:id="@+id/characterBirthYearTv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:textSize="16sp"
+            android:textAllCaps="true"
+            android:textColor="@color/textColorDayNight"
+            android:fontFamily="@font/open_sans_bold"
+            app:layout_constraintTop_toTopOf="@+id/dobTitleTv"
+            app:layout_constraintBottom_toBottomOf="@+id/dobTitleTv"
+            app:layout_constraintStart_toEndOf="@+id/guideline"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="19BBY"/>
 
