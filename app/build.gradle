@@ -52,6 +52,9 @@ dependencies {
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
 
+    //swipe refresh
+    implementation libs.androidx.swiperefreshlayout
+
     //navigation
     implementation libs.androidx.navigation.fragment
     implementation libs.androidx.navigation.ui //needed if bottom nav is used
@@ -78,6 +81,9 @@ dependencies {
 
     // Glide
     implementation libs.glide
+
+    // Logger
+    implementation libs.logger
 
 
 }
