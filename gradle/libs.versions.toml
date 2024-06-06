@@ -1,29 +1,29 @@
 [versions]
 agp = "8.3.2"
-composeBom = "2024.05.00"
 kotlin = "1.9.22"
-coreKtx = "1.12.0"
+coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
-appcompat = "1.6.1"
+appcompat = "1.7.0"
 logger = "2.2.0"
-material = "1.11.0"
-activity = "1.8.2"
+material = "1.12.0"
+activity = "1.9.0"
 constraintlayout = "2.1.4"
-mixpanelAndroid = "7.5.2"
 navigationFragment = "2.7.7"
 ksp = "1.9.22-1.0.17"
 hilt="2.51"
 okhttpprofiler = "1.0.8"
-retrofit = "2.9.0"
+retrofit = "2.11.0"
 roomRuntime = "2.6.1"
 okhttp = "4.12.0"
 glide = "4.16.0"
 swiperefreshlayout = "1.1.0"
+activityCompose = "1.9.0"
+composeBom = "2024.05.00"
+uiTooling = "1.6.7"
 
 [libraries]
-androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -32,6 +32,13 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 logger = { module = "com.orhanobut:logger", version.ref = "logger" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 safe-args-gradle-plugin = { group = "androidx.navigation", name = "navigation-safe-args-gradle-plugin",version.ref = "navigationFragment" }
 androidx-navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
@@ -48,6 +55,7 @@ okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhtt
 okhttp-interceptor = {group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp"}
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
