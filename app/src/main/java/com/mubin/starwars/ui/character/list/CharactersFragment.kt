@@ -22,7 +22,7 @@ class CharactersFragment : Fragment(){
     private lateinit var binding: FragmentCharactersBinding
     private lateinit var lazyLoading: RecyclerViewLazyLoading
     private var characterAdapter: CharacterListAdapter = CharacterListAdapter()
-    private val vm: CharacterListViewModel by viewModels()
+    private val vm by viewModels<CharacterListViewModel>()
 
     private val loadMoreListener = object : RecyclerViewLazyLoading.Listener {
         override fun loadMore() {
@@ -97,7 +97,6 @@ class CharactersFragment : Fragment(){
 
             }
 
-            com.google.android.material.R.attr.linearProgressIndicatorStyle
             count.observe(viewLifecycleOwner) { count ->
                 val textToSet = if ((count ?: 0) > 1) {
                     "${count.toString()} Characters Found"
