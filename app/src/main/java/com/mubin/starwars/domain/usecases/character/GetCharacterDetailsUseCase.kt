@@ -1,4 +1,4 @@
-package com.mubin.starwars.domain.usecases
+package com.mubin.starwars.domain.usecases.character
 
 import com.mubin.starwars.base.utils.UseCase
 import com.mubin.starwars.data.model.CharacterDetailsResponse
