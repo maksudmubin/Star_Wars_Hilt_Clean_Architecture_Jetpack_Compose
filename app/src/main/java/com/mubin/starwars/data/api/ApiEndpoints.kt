@@ -22,7 +22,7 @@ interface ApiEndpoints {
         @Url url: String
     ) : Call<CharacterDetailsResponse?>
 
-    @GET("planets")
+    @GET
     fun getPlanets(
         @Url url: String
     ) : Call<PlanetListResponse?>
