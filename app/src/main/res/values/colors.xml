@@ -6,6 +6,7 @@
     <color name="splashBg">#FFFFFF</color>
     <color name="splashIcon">#FF000000</color>
     <color name="commonColor">#3AD972</color>
+    <color name="parentBg">#FEF7FF</color>
     <color name="primaryBg">#FFFFFF</color>
     <color name="navBarStroke">#1A111B45</color>
     <color name="warningColor">#D80027</color>
@@ -34,6 +35,7 @@
     <color name="switchTrackCheckedBg">#ADFFD0</color>
     <color name="switchThumbUncheckedBg">#FFFFFF</color>
     <color name="imageColorDayNight">#000000</color>
+    <color name="cardBorderStroke">#FFFFFF</color>
 </resources>
 
 
