@@ -1,6 +1,5 @@
 package com.mubin.starwars.base.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -17,15 +16,18 @@ private val DarkColorScheme = darkColorScheme(
     primary = PrimaryBgDark,
     onPrimary = textOnPrimaryDark,
     secondary = textOnPrimaryDark,
-    tertiary = borderStrokeDark,
-    background = parentBgDark
+    tertiary = dividerDark,
+    outline = borderStrokeDark,
+    background = parentBgDark,
+
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryBg,
     onPrimary = textOnPrimary,
     secondary = textOnPrimary2,
-    tertiary = borderStroke,
+    tertiary = divider,
+    outline = borderStroke,
     background = parentBg
 
     /* Other default colors to override
