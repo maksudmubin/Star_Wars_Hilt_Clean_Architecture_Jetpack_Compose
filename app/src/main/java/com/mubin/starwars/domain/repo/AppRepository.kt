@@ -1,4 +1,4 @@
-package com.mubin.starwars.data.repo
+package com.mubin.starwars.domain.repo
 
 import com.mubin.starwars.data.model.CharacterDetailsResponse
 import com.mubin.starwars.data.model.CharacterListResponse

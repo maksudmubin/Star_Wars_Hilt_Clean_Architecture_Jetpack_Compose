@@ -1,8 +1,8 @@
 package com.mubin.starwars.base.di
 
 import com.mubin.starwars.data.api.ApiService
-import com.mubin.starwars.data.repo.AppRepository
-import com.mubin.starwars.domain.repo.AppRepositoryImpl
+import com.mubin.starwars.domain.repo.AppRepository
+import com.mubin.starwars.data.repo.AppRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
