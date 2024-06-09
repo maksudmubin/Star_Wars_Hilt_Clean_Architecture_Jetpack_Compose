@@ -19,23 +19,30 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,12 +51,11 @@ import androidx.fragment.app.viewModels
 import com.mubin.starwars.R
 import com.mubin.starwars.base.theme.StarWarsTheme
 import com.mubin.starwars.base.utils.Constants.PLANETS
+import com.mubin.starwars.base.utils.CustomAlertDialog
+import com.mubin.starwars.base.utils.InfiniteListHandler
 import com.mubin.starwars.base.utils.executeBodyOrReturnNullSuspended
-import com.mubin.starwars.base.utils.logThis
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class PlanetsFragment : Fragment() {
@@ -65,7 +71,17 @@ class PlanetsFragment : Fragment() {
             setContent {
 
                 StarWarsTheme {
+                    val shouldShowDialog = remember { mutableStateOf(false) }
                     val scope = rememberCoroutineScope()
+                    val listViewState = rememberLazyListState()
+
+                    CustomAlertDialog(
+                        shouldShowDialog = shouldShowDialog,
+                        title = "Error",
+                        text = "Ops! Something bad happened.",
+                        positiveButtonTitle = "Okay"
+                    )
+
                     if (vm.uiState.response == null) {
                         LaunchedEffect(
                             key1 = "PlanetsFragment",
@@ -77,16 +93,18 @@ class PlanetsFragment : Fragment() {
 
                                         val result = vm.getPlanets(PLANETS)
                                         if (result == null) {
-                                            //handle error
+                                            shouldShowDialog.value = true
                                         } else {
                                             vm.uiState.response = result
+                                            vm.uiState.totalCount = result.count ?: 0
+                                            vm.uiState.nextPage = result.next ?: ""
                                             result.results?.forEach{ planet ->
                                                 vm.uiState.planetList.add(planet)
                                             }
-
-                                            vm.uiState.isLoading = false
                                             vm.uiState.showRootLayout = true
                                         }
+
+                                        vm.uiState.isLoading = false
                                     }
 
                                 }
@@ -95,7 +113,33 @@ class PlanetsFragment : Fragment() {
                         )
                     }
 
-                    InitView(vm.uiState)
+                    if (vm.uiState.planetList.isNotEmpty()) {
+                        InfiniteListHandler(listState = listViewState, buffer = 2) {
+                            scope.launch {
+                                executeBodyOrReturnNullSuspended {
+                                    if (vm.uiState.nextPage.isNotEmpty()) {
+                                        vm.uiState.isMoreLoading = true
+                                        val result = vm.getPlanets(vm.uiState.nextPage)
+                                        if (result == null) {
+                                            //handle error
+                                        } else {
+                                            vm.uiState.response = result
+                                            vm.uiState.nextPage = result.next ?: ""
+                                            result.results?.forEach { planet ->
+                                                vm.uiState.planetList.add(planet)
+                                            }
+                                        }
+
+                                        vm.uiState.isMoreLoading = false
+                                    }
+                                }
+
+                            }
+
+                        }
+                    }
+
+                    InitView(vm.uiState, listViewState)
 
                 }
             }
@@ -104,152 +148,224 @@ class PlanetsFragment : Fragment() {
     }
 
     @Composable
-    private fun InitView(uiState: PlanetsUIState) {
+    private fun InitView(uiState: PlanetsUIState, listViewState: LazyListState) {
 
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            if (uiState.isLoading) {
-
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .size(50.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 5.dp
-                )
-
-            } else {
-                if (uiState.showRootLayout) {
-                    Column(
+        Scaffold(
+            modifier = Modifier,
+            topBar = {
+                if (!uiState.isLoading) {
+                    Box(
                         modifier = Modifier
                             .background(
-                                color = MaterialTheme.colorScheme.background
+                                color = MaterialTheme.colorScheme.primary
                             )
-                            .fillMaxSize()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .fillMaxWidth()
                     ) {
 
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                                .fillMaxWidth()
-                        ) {
+                        Text(
+                            text = "${uiState.response?.count ?: 0} Planets Found",
+                            fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
 
-                            Text(
-                                text = "${uiState.response?.count} Planets Found",
-                                fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
-                                fontSize = 16.sp,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-
-                        }
-
-                        LazyColumn(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .fillMaxSize()
-                        ) {
-
-                            item {
-                                Spacer(
-                                    modifier = Modifier
-                                        .padding(top = 8.dp)
-                                )
-                            }
-
-                            items(uiState.planetList.size) { position ->
-
-                                Card(
-                                    modifier = Modifier
-                                        .padding(vertical = 8.dp)
-                                        .height(IntrinsicSize.Min)
-                                        .fillParentMaxWidth(),
-                                    shape = RoundedCornerShape(8.dp),
-                                    border = BorderStroke(
-                                        width = 1.dp,
-                                        color = MaterialTheme.colorScheme.tertiary
-                                    ),
-                                    elevation = CardDefaults.cardElevation(5.dp)
-                                ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .background(
-                                                color = MaterialTheme.colorScheme.primary
-                                            )
-                                            .padding(16.dp)
-                                            .fillMaxHeight(),
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-
-                                        Column(
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .fillMaxHeight()
-                                        ) {
-
-                                            Text(
-                                                modifier = Modifier
-                                                    .fillMaxWidth(),
-                                                text = "MMMMMMMMM",
-                                                textAlign = TextAlign.End
-                                            )
-                                            Text(
-                                                modifier = Modifier
-                                                    .fillMaxWidth(),
-                                                text = "MMMMMMMMM",
-                                                textAlign = TextAlign.End
-                                            )
-
-                                        }
-
-                                        VerticalDivider(
-                                            modifier = Modifier
-                                                .padding(horizontal = 16.dp)
-                                                .fillMaxHeight(),
-                                            thickness = 2.dp,
-                                            color = Color.Black
-                                        )
-
-                                        Column(
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .fillMaxHeight()
-                                        ) {
-
-                                            Text(
-                                                modifier = Modifier
-                                                    .fillMaxWidth(),
-                                                text = "MMMMMMMMM",
-                                                textAlign = TextAlign.Start
-                                            )
-                                            Text(
-                                                modifier = Modifier
-                                                    .fillMaxWidth(),
-                                                text = "MMMMMMMMM",
-                                                textAlign = TextAlign.Start
-                                            )
-
-                                        }
-
-                                    }
-                                }
-
-                            }
-
-                            item {
-                                Spacer(
-                                    modifier = Modifier
-                                        .padding(top = 8.dp)
-                                )
-                            }
-
-                        }
                     }
                 }
             }
+        ) {
+
+
+            if (uiState.isLoading) {
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .padding(it)
+                            .size(40.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 4.dp
+                    )
+
+                }
+
+            } else {
+                if (uiState.showRootLayout) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(it)
+                            .padding(horizontal = 16.dp)
+                            .fillMaxSize(),
+                        state = listViewState
+                    ) {
+
+                        item {
+                            Spacer(
+                                modifier = Modifier
+                                    .padding(top = 8.dp)
+                            )
+                        }
+
+                        items(uiState.planetList.size) { position ->
+
+                            val planetData = uiState.planetList[position]
+
+                            Card(
+                                modifier = Modifier
+                                    .padding(vertical = 8.dp)
+                                    .height(IntrinsicSize.Min)
+                                    .fillParentMaxWidth(),
+                                shape = RoundedCornerShape(8.dp),
+                                border = BorderStroke(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.outline
+                                ),
+                                elevation = CardDefaults.cardElevation(5.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .background(
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                        .padding(16.dp)
+                                        .fillMaxHeight(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(5f)
+                                            .fillMaxHeight()
+                                    ) {
+
+                                        Text(
+                                            modifier = Modifier
+                                                .fillMaxWidth(),
+                                            text = "Name:",
+                                            fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
+                                            fontSize = 14.sp,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            textAlign = TextAlign.End
+                                        )
+                                        Text(
+                                            modifier = Modifier
+                                                .padding(top = 4.dp)
+                                                .fillMaxWidth(),
+                                            text = "Gravity:",
+                                            fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
+                                            fontSize = 14.sp,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            textAlign = TextAlign.End
+                                        )
+                                        Text(
+                                            modifier = Modifier
+                                                .padding(top = 4.dp)
+                                                .fillMaxWidth(),
+                                            text = "Surface Water:",
+                                            fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
+                                            fontSize = 14.sp,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            textAlign = TextAlign.End
+                                        )
+
+                                    }
+
+                                    VerticalDivider(
+                                        modifier = Modifier
+                                            .padding(horizontal = 16.dp)
+                                            .fillMaxHeight(),
+                                        thickness = 2.dp,
+                                        color = MaterialTheme.colorScheme.tertiary
+                                    )
+
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(6f)
+                                            .fillMaxHeight()
+                                    ) {
+
+                                        Text(
+                                            modifier = Modifier
+                                                .fillMaxWidth(),
+                                            text = planetData?.name ?: "",
+                                            fontFamily = FontFamily(Font(R.font.open_sans_bold)),
+                                            fontSize = 16.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            color = MaterialTheme.colorScheme.onPrimary,
+                                            textAlign = TextAlign.Start
+                                        )
+                                        Text(
+                                            modifier = Modifier
+                                                .padding(top = 4.dp)
+                                                .fillMaxWidth(),
+                                            text = planetData?.gravity ?: "",
+                                            fontFamily = FontFamily(Font(R.font.open_sans_bold)),
+                                            fontSize = 16.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            color = MaterialTheme.colorScheme.onPrimary,
+                                            textAlign = TextAlign.Start
+                                        )
+                                        Text(
+                                            modifier = Modifier
+                                                .padding(top = 4.dp)
+                                                .fillMaxWidth(),
+                                            text = planetData?.surfaceWater ?: "",
+                                            fontFamily = FontFamily(Font(R.font.open_sans_bold)),
+                                            fontSize = 16.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            color = MaterialTheme.colorScheme.onPrimary,
+                                            textAlign = TextAlign.Start
+                                        )
+
+                                    }
+
+                                }
+                            }
+
+                        }
+
+                        if (uiState.isMoreLoading) {
+
+                            item {
+
+                                Box(
+                                    modifier = Modifier
+                                        .padding(top = 16.dp, bottom = 24.dp)
+                                        .fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .size(40.dp),
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        strokeWidth = 4.dp
+                                    )
+
+                                }
+                            }
+
+                        }
+
+                        item {
+                            Spacer(
+                                modifier = Modifier
+                                    .padding(top = 8.dp)
+                            )
+                        }
+
+                    }
+                }
+            }
+
         }
 
     }
@@ -263,7 +379,7 @@ class PlanetsFragment : Fragment() {
                 .fillMaxSize()
         ) {
 
-            //InitView(vm.uiState)
+            //InitView(PlanetsUIState())
 
         }
     }
