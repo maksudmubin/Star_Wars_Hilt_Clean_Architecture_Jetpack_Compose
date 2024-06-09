@@ -1,122 +1,374 @@
 package com.mubin.starwars.ui.character.list
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.StaggeredGridLayoutManager.VERTICAL
 import com.mubin.starwars.R
+import com.mubin.starwars.base.theme.StarWarsTheme
+import com.mubin.starwars.base.utils.Constants
 import com.mubin.starwars.base.utils.Constants.CHARACTERS
-import com.mubin.starwars.base.utils.RecyclerViewLazyLoading
-import com.mubin.starwars.base.utils.attachSpeedyLayoutManager
-import com.mubin.starwars.databinding.FragmentCharactersBinding
+import com.mubin.starwars.base.utils.CustomAlertDialog
+import com.mubin.starwars.base.utils.InfiniteListHandler
+import com.mubin.starwars.base.utils.executeBodyOrReturnNullSuspended
+import com.mubin.starwars.ui.planets.PlanetsUIState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class CharactersFragment : Fragment(){
 
-    private lateinit var binding: FragmentCharactersBinding
-    private lateinit var lazyLoading: RecyclerViewLazyLoading
-    private var characterAdapter: CharacterListAdapter = CharacterListAdapter()
     private val vm by viewModels<CharacterListViewModel>()
 
-    private val loadMoreListener = object : RecyclerViewLazyLoading.Listener {
-        override fun loadMore() {
-            if (vm.next.value != null) {
-                vm.getCharacters(vm.next.value ?: CHARACTERS)
-            }
-        }
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return FragmentCharactersBinding.inflate(layoutInflater).also {
-            binding = it
-        }.root
-    }
+        return ComposeView(requireContext()).apply {
+            setContent {
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+                StarWarsTheme {
 
-        initView()
-        setUpObserver()
+                    val shouldShowDialog = remember { mutableStateOf(false) }
+                    val scope = rememberCoroutineScope()
+                    val listViewState = rememberLazyListState()
 
-    }
+                    CustomAlertDialog(
+                        shouldShowDialog = shouldShowDialog,
+                        title = "Error",
+                        text = "Ops! Something bad happened.",
+                        positiveButtonTitle = "Okay"
+                    )
 
-    override fun onResume() {
-        super.onResume()
-        lazyLoading.registerScrollListener(binding.charactersRv, loadMoreListener)
-    }
+                    if (vm.uiState.response == null) {
+                        LaunchedEffect(
+                            key1 = "PlanetsFragment",
+                            block = {
+                                scope.launch {
+                                    executeBodyOrReturnNullSuspended {
+                                        vm.uiState.isLoading = true
+                                        vm.uiState.showRootLayout = false
 
-    override fun onPause() {
-        super.onPause()
-        lazyLoading.removeListener()
-        viewModelStore.clear()
-    }
+                                        val result = vm.getCharacters(CHARACTERS)
+                                        if (result == null) {
+                                            shouldShowDialog.value = true
+                                        } else {
+                                            vm.uiState.response = result
+                                            vm.uiState.totalCount = result.count ?: 0
+                                            vm.uiState.nextPage = result.next ?: ""
+                                            result.results?.forEach{ planet ->
+                                                vm.uiState.characterList.add(planet)
+                                            }
+                                            vm.uiState.showRootLayout = true
+                                        }
 
-    private fun initView() {
-        lazyLoading = RecyclerViewLazyLoading.getInstance()
-        binding.charactersRv.attachSpeedyLayoutManager(VERTICAL, false)
-        with(binding.charactersRv) {
-            adapter = characterAdapter
-            isNestedScrollingEnabled = false
-            setHasFixedSize(false)
+                                        vm.uiState.isLoading = false
+                                    }
+
+                                }
+
+                            }
+                        )
+                    }
+
+                    if (vm.uiState.characterList.isNotEmpty()) {
+                        InfiniteListHandler(listState = listViewState, buffer = 2) {
+                            scope.launch {
+                                executeBodyOrReturnNullSuspended {
+                                    if (vm.uiState.nextPage.isNotEmpty()) {
+                                        vm.uiState.isMoreLoading = true
+                                        val result = vm.getCharacters(vm.uiState.nextPage)
+                                        if (result == null) {
+                                            //handle error
+                                        } else {
+                                            vm.uiState.response = result
+                                            vm.uiState.nextPage = result.next ?: ""
+                                            result.results?.forEach { planet ->
+                                                vm.uiState.characterList.add(planet)
+                                            }
+                                        }
+
+                                        vm.uiState.isMoreLoading = false
+                                    }
+                                }
+
+                            }
+
+                        }
+                    }
+
+                    InitView(vm.uiState, listViewState)
+
+                }
+
+            }
+
         }
     }
 
-    private fun setUpObserver() {
-        vm.apply {
+    @Composable
+    private fun InitView(uiState: CharactersUIState, listViewState: LazyListState) {
 
-            getCharacters(CHARACTERS)
+        Scaffold(
+            modifier = Modifier,
+            topBar = {
+                if (!uiState.isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .fillMaxWidth()
+                    ) {
 
-            isLoading.observe(viewLifecycleOwner) { isLoading ->
+                        Text(
+                            text = "${uiState.response?.count ?: 0} Planets Found",
+                            fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
 
-                if (isLoading) {
-                    if (next.value.isNullOrEmpty()) {
-                        binding.progressBarLoadingMore.visibility = View.GONE
-                        binding.progressBar.visibility = View.VISIBLE
-                        binding.countTv.visibility = View.GONE
-                        binding.charactersRv.visibility = View.GONE
-                    } else {
-                        binding.progressBarLoadingMore.visibility = View.VISIBLE
-                    }
-
-                } else {
-                    binding.progressBarLoadingMore.visibility = View.GONE
-                    binding.progressBar.visibility = View.GONE
-                    binding.countTv.visibility = View.VISIBLE
-                    binding.charactersRv.visibility = View.VISIBLE
-                }
-
-            }
-
-            count.observe(viewLifecycleOwner) { count ->
-                val textToSet = if ((count ?: 0) > 1) {
-                    "${count.toString()} Characters Found"
-                } else {
-                    "${count.toString()} Character Found"
-                }
-                binding.countTv.text = textToSet
-            }
-
-            characterList.observe(viewLifecycleOwner) { list ->
-
-                if (list != null) {
-                    characterAdapter.addDataSet(list) {
-                        Log.d("loadData", "success $it")
                     }
                 }
+            }
+        ) {
 
+
+            if (uiState.isLoading) {
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .padding(it)
+                            .size(40.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 4.dp
+                    )
+
+                }
+
+            } else {
+                if (uiState.showRootLayout) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(it)
+                            .padding(horizontal = 16.dp)
+                            .fillMaxSize(),
+                        state = listViewState
+                    ) {
+
+                        item {
+                            Spacer(
+                                modifier = Modifier
+                                    .padding(top = 8.dp)
+                            )
+                        }
+
+                        items(uiState.characterList.size) { position ->
+
+                            val planetData = uiState.characterList[position]
+
+                            Card(
+                                modifier = Modifier
+                                    .padding(vertical = 8.dp)
+                                    .height(IntrinsicSize.Min)
+                                    .fillParentMaxWidth(),
+                                shape = RoundedCornerShape(8.dp),
+                                border = BorderStroke(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.outline
+                                ),
+                                elevation = CardDefaults.cardElevation(5.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .background(
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                        .padding(16.dp)
+                                        .fillMaxHeight(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(5f)
+                                            .fillMaxHeight()
+                                    ) {
+
+                                        Text(
+                                            modifier = Modifier
+                                                .fillMaxWidth(),
+                                            text = "Name:",
+                                            fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
+                                            fontSize = 14.sp,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            textAlign = TextAlign.End
+                                        )
+                                        Text(
+                                            modifier = Modifier
+                                                .padding(top = 4.dp)
+                                                .fillMaxWidth(),
+                                            text = "Gender:",
+                                            fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
+                                            fontSize = 14.sp,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            textAlign = TextAlign.End
+                                        )
+                                        Text(
+                                            modifier = Modifier
+                                                .padding(top = 4.dp)
+                                                .fillMaxWidth(),
+                                            text = "Year of Birth:",
+                                            fontFamily = FontFamily(Font(R.font.open_sans_semi_bold)),
+                                            fontSize = 14.sp,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            textAlign = TextAlign.End
+                                        )
+
+                                    }
+
+                                    VerticalDivider(
+                                        modifier = Modifier
+                                            .padding(horizontal = 16.dp)
+                                            .fillMaxHeight(),
+                                        thickness = 2.dp,
+                                        color = MaterialTheme.colorScheme.tertiary
+                                    )
+
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(6f)
+                                            .fillMaxHeight()
+                                    ) {
+
+                                        Text(
+                                            modifier = Modifier
+                                                .fillMaxWidth(),
+                                            text = planetData?.name ?: "",
+                                            fontFamily = FontFamily(Font(R.font.open_sans_bold)),
+                                            fontSize = 16.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            color = MaterialTheme.colorScheme.onPrimary,
+                                            textAlign = TextAlign.Start
+                                        )
+                                        Text(
+                                            modifier = Modifier
+                                                .padding(top = 4.dp)
+                                                .fillMaxWidth(),
+                                            text = planetData?.gender ?: "",
+                                            fontFamily = FontFamily(Font(R.font.open_sans_bold)),
+                                            fontSize = 16.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            color = MaterialTheme.colorScheme.onPrimary,
+                                            textAlign = TextAlign.Start
+                                        )
+                                        Text(
+                                            modifier = Modifier
+                                                .padding(top = 4.dp)
+                                                .fillMaxWidth(),
+                                            text = planetData?.birthYear ?: "",
+                                            fontFamily = FontFamily(Font(R.font.open_sans_bold)),
+                                            fontSize = 16.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            color = MaterialTheme.colorScheme.onPrimary,
+                                            textAlign = TextAlign.Start
+                                        )
+
+                                    }
+
+                                }
+                            }
+
+                        }
+
+                        if (uiState.isMoreLoading) {
+
+                            item {
+
+                                Box(
+                                    modifier = Modifier
+                                        .padding(top = 16.dp, bottom = 24.dp)
+                                        .fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .size(40.dp),
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        strokeWidth = 4.dp
+                                    )
+
+                                }
+                            }
+
+                        }
+
+                        item {
+                            Spacer(
+                                modifier = Modifier
+                                    .padding(top = 8.dp)
+                            )
+                        }
+
+                    }
+                }
             }
 
         }
+
     }
 
 }
