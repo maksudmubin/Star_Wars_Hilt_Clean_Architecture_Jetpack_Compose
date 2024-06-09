@@ -1,7 +1,7 @@
 package com.mubin.starwars.ui.planets
 
 import androidx.lifecycle.ViewModel
-import com.mubin.starwars.data.model.PlanetListResponse
+import com.mubin.starwars.data.model.planet.PlanetListResponse
 import com.mubin.starwars.domain.usecases.planet.GetPlanetsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

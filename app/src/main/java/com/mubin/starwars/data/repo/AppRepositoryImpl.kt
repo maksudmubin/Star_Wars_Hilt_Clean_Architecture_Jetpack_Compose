@@ -1,12 +1,12 @@
 package com.mubin.starwars.data.repo
 
 import com.mubin.starwars.data.api.ApiService
-import com.mubin.starwars.data.model.CharacterDetailsResponse
-import com.mubin.starwars.data.model.CharacterListResponse
-import com.mubin.starwars.data.model.PlanetDetailsResponse
-import com.mubin.starwars.data.model.PlanetListResponse
-import com.mubin.starwars.data.model.StarshipDetailsResponse
-import com.mubin.starwars.data.model.StarshipListResponse
+import com.mubin.starwars.data.model.character.CharacterDetailsResponse
+import com.mubin.starwars.data.model.character.CharacterListResponse
+import com.mubin.starwars.data.model.planet.PlanetDetailsResponse
+import com.mubin.starwars.data.model.planet.PlanetListResponse
+import com.mubin.starwars.data.model.starship.StarshipDetailsResponse
+import com.mubin.starwars.data.model.starship.StarshipListResponse
 import com.mubin.starwars.domain.repo.AppRepository
 import javax.inject.Inject
 

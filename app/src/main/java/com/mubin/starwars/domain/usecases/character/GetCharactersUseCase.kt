@@ -1,7 +1,7 @@
 package com.mubin.starwars.domain.usecases.character
 
 import com.mubin.starwars.base.utils.UseCase
-import com.mubin.starwars.data.model.CharacterListResponse
+import com.mubin.starwars.data.model.character.CharacterListResponse
 import com.mubin.starwars.domain.repo.AppRepository
 import javax.inject.Inject
 

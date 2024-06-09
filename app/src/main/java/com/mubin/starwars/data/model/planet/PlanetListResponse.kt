@@ -1,4 +1,4 @@
-package com.mubin.starwars.data.model
+package com.mubin.starwars.data.model.planet
 
 
 import com.google.gson.annotations.SerializedName

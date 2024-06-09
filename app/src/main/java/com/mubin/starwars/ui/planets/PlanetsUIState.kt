@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.mubin.starwars.data.model.PlanetListResponse
+import com.mubin.starwars.data.model.planet.PlanetListResponse
 
 class PlanetsUIState {
 
