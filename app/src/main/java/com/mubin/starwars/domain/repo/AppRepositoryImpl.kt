@@ -16,9 +16,14 @@ constructor(private val apiService: ApiService) : AppRepository {
 
     override suspend fun getCharacters(url: String): CharacterListResponse? {
 
-        val response = apiService.getCharacters(url).execute()
 
-        return if (response.isSuccessful) {
+        val response = try {
+            apiService.getCharacters(url).execute()
+        } catch (e: Exception) {
+            null
+        }
+
+        return if (response?.isSuccessful == true) {
             response.body()
         } else {
             null
@@ -40,9 +45,13 @@ constructor(private val apiService: ApiService) : AppRepository {
 
     override suspend fun getPlanets(url: String): PlanetListResponse? {
 
-        val response = apiService.getPlanets(url).execute()
+        val response = try {
+            apiService.getPlanets(url).execute()
+        } catch (e: Exception) {
+            null
+        }
 
-        return if (response.isSuccessful) {
+        return if (response?.isSuccessful == true) {
             response.body()
         } else {
             null
