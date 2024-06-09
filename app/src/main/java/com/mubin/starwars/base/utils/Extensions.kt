@@ -27,48 +27,6 @@ fun logThis(message: Any) {
     }
 }
 
-inline fun handlerPostDelayed(delay: Long, crossinline onSuccess: () -> Unit) {
-    handlerDelayTimer.cancel()
-    handlerDelayTimer = Timer()
-    handlerDelayTimer.schedule(object : TimerTask() {
-        override fun run() {
-            Handler(Looper.getMainLooper()).post {
-                onSuccess.invoke()
-            }
-        }
-    }, delay)
-}
-
-/**
- * Add an action which will be invoked when the text is changing.
- *
- * @return the [SearchView.OnQueryTextListener] added to the [SearchView]
- */
-inline fun EditText.doAfterTextChanged(
-    delay: Long = 500,
-    crossinline onTextChangedDelayed: (text: String) -> Unit,
-) = doOnQueryTextListener(delay, onTextChangedDelayed)
-
-inline fun EditText.doOnQueryTextListener(
-    delay: Long,
-    crossinline onTextChangedDelayed: (text: String) -> Unit,
-): TextWatcher {
-    val queryListener = object : TextWatcher {
-
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-        override fun afterTextChanged(s: Editable?) {
-            handlerPostDelayed(delay) {
-                onTextChangedDelayed.invoke(s.toString() ?: "")
-            }
-        }
-    }
-    this.addTextChangedListener(queryListener)
-    return queryListener
-}
-
 fun Context.getActivity(): Activity? = when (this) {
     is Activity -> this
     is ContextWrapper -> baseContext.getActivity()
